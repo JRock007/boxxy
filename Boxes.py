@@ -232,7 +232,7 @@ class BoxesGame(ConnectionListener):
         self.otherplayer += 1
 
     def initGraphics(self):
-        self.normallinev = pygame.image.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "normalline.jpg"))
+        self.normallinev = pygame.image.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "normalline.png"))
         self.normallineh = pygame.transform.rotate(pygame.image.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "normalline.png")), -90)
         self.bar_donev = pygame.image.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "bar_done.png"))
         self.bar_doneh = pygame.transform.rotate(pygame.image.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "bar_done.png")), -90)
