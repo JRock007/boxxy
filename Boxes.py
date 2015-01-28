@@ -17,11 +17,11 @@ if(".exe" in approot):
 
 class BoxesGame(ConnectionListener):
     def initSound(self):
-        pygame.mixer.music.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "music.wav"))
+        #pygame.mixer.music.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "music.wav"))
         self.winSound = pygame.mixer.Sound(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "win.wav"))
         self.loseSound = pygame.mixer.Sound(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "lose.wav"))
         self.placeSound = pygame.mixer.Sound(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "place.wav"))
-        pygame.mixer.music.play()
+        #pygame.mixer.music.play()
 
     def Network_close(self, data):
         exit()
@@ -89,7 +89,9 @@ class BoxesGame(ConnectionListener):
         while not self.running:
             self.Pump()
             connection.Pump()
-            sleep(0.01)
+            # sleep(0.05) sleep apparently prevents pump...
+            print "Pumping..."
+        print "Done pumping..."
         # determine attributes from player #
         if self.num == 0:
             self.turn = True
