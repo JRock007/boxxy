@@ -5,7 +5,7 @@ from time import sleep
 
 class ClientChannel(PodSixNet.Channel.Channel):
     def Network(self, data):
-        print data
+        print(data)
 
     def Network_place(self, data):
         # deconsolidate all of the data from the dictionary
@@ -40,14 +40,17 @@ class BoxesServer(PodSixNet.Server.Server):
         self.games = []
         self.queue = None
         self.currentIndex = 0
+        print("Waiting for clients...")
 
     def Connected(self, channel, addr):
-        print 'new connection:', channel
+        print("new connection:", channel)
         if self.queue is None:
+            print("User number 1 joined the game !")
             self.currentIndex += 1
             channel.gameid = self.currentIndex
             self.queue = Game(channel, self.currentIndex)
         else:
+            print("User number 2 joined the game !")
             channel.gameid = self.currentIndex
             self.queue.player1 = channel
             self.queue.player0.Send({"action": "startgame", "player": 0, "gameid": self.queue.gameid})
@@ -125,7 +128,7 @@ class Game:
             # send data and turn data to each player
             self.player0.Send(data)
             self.player1.Send(data)
-print "STARTING SERVER ON LOCALHOST"
+print("STARTING SERVER ON LOCALHOST")
 #  try:
 address = raw_input("Host:Port (localhost:8000): ")
 if not address:

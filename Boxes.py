@@ -17,11 +17,12 @@ if(".exe" in approot):
 
 class BoxesGame(ConnectionListener):
     def initSound(self):
-        #pygame.mixer.music.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "music.wav"))
+        pygame.mixer.music.load(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "music.wav"))
         self.winSound = pygame.mixer.Sound(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "win.wav"))
         self.loseSound = pygame.mixer.Sound(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "lose.wav"))
         self.placeSound = pygame.mixer.Sound(os.path.join(os.environ.get("RESOURCEPATH", approot), "resources", "place.wav"))
-        #pygame.mixer.music.play()
+        if self.enableSound:
+            pygame.mixer.music.play()
 
     def Network_close(self, data):
         exit()
@@ -36,7 +37,9 @@ class BoxesGame(ConnectionListener):
         self.gameid = data["gameid"]
 
     def Network_place(self, data):
-        self.placeSound.play()
+        if self.enableSound:
+            self.placeSound.play()
+
         #  get attributes
         x = data["x"]
         y = data["y"]
@@ -64,13 +67,23 @@ class BoxesGame(ConnectionListener):
         self.clock = pygame.time.Clock()
         # initialize the graphics
         self.initGraphics()
-        self.initSound()
         self.turn = True
         self.owner = [[0 for x in range(6)] for y in range(6)]
         self.me = 0
         self.otherplayer = 0
         self.didiwin = False
         self.running = False
+        enableSound = raw_input("Enable sound and music: ")
+        if enableSound == "1" or enableSound.lower() == "true":
+            self.enableSound = True
+        elif enableSound == "0" or enableSound.lower() == "1":
+            self.enableSound = False
+        else:
+            print("Unrecognized input, defaulting to False")
+            self.enableSound = False
+
+        self.initSound()
+
         address = raw_input("Address of Server: ")
         try:
             if not address:
@@ -79,19 +92,18 @@ class BoxesGame(ConnectionListener):
                 host, port = address.split(":")
             self.Connect((host, int(port)))
         except:
-            print "Error Connecting to Server"
-            print "Usage:", "host:port"
-            print "e.g.", "localhost:31425"
+            print("Error Connecting to Server")
+            print("Usage:", "host:port")
+            print("e.g.", "localhost:31425")
             exit()
-        print "Boxes client started"
+        print("Boxes client started, waiting for server and/or the other player")
         self.running = False
         self.owner = [[0 for x in range(6)] for y in range(6)]
         while not self.running:
             self.Pump()
             connection.Pump()
-            # sleep(0.05) sleep apparently prevents pump...
-            print "Pumping..."
-        print "Done pumping..."
+            sleep(0.05)
+        print("Starting game")
         # determine attributes from player #
         if self.num == 0:
             self.turn = True
@@ -220,7 +232,8 @@ class BoxesGame(ConnectionListener):
         self.boardh[data["y"]+1][data["x"]] = True
         self.boardv[data["y"]][data["x"]+1] = True
         # add one point to my score
-        self.winSound.play()
+        if self.enableSound:
+            self.winSound.play()
         self.me += 1
 
     def Network_lose(self, data):
@@ -230,7 +243,8 @@ class BoxesGame(ConnectionListener):
         self.boardh[data["y"]+1][data["x"]] = True
         self.boardv[data["y"]][data["x"]+1] = True
         # add one to other players score
-        self.loseSound.play()
+        if self.enableSound:
+            self.loseSound.play()
         self.otherplayer += 1
 
     def initGraphics(self):
