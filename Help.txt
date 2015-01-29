@@ -1,0 +1,8 @@
+How to play:
+1. One of the players must launch the server.py file, and enter his address and a port to use.
+2. Both players must then cd to the folder’s location, and launch the main.py file. 
+3. Select whether music and sounds should play (0 or 1, yes or no and true or false are valid answers). Note: A non-valid answer will default the choice to no sound/music.
+4. Both players must enter the server address, which was set in step 1.
+5. Once both players are connected, the game should start. Have fun !
+
+At the end of each game, the app must be closed and each player must go through steps 3 through 5 again. As long as the server isn’t stopped, step 1 isn’t required.

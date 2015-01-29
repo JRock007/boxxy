@@ -45,12 +45,12 @@ class BoxesServer(PodSixNet.Server.Server):
     def Connected(self, channel, addr):
         print("new connection:", channel)
         if self.queue is None:
-            print("User number 1 joined the game !")
+            print("Player 1 joined the game !")
             self.currentIndex += 1
             channel.gameid = self.currentIndex
             self.queue = Game(channel, self.currentIndex)
         else:
-            print("User number 2 joined the game !")
+            print("Player 2 joined the game !")
             channel.gameid = self.currentIndex
             self.queue.player1 = channel
             self.queue.player0.Send({"action": "startgame", "player": 0, "gameid": self.queue.gameid})
