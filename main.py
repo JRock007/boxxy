@@ -1,9 +1,14 @@
+from pygame.locals import *
 import pygame
 import math
 import os
 import sys
 from PodSixNet.Connection import ConnectionListener, connection
 from time import sleep
+from EzText import eztext
+
+if sys.platform == "win32":
+    import pygame._view
 
 # Set root path
 try:
@@ -13,6 +18,65 @@ except NameError:  # We are the main py2exe script, not a module
 
 if(".exe" in approot):
     approot = approot.replace("boxxy.exe", "")
+
+
+# defining some colors
+blue = (0, 0, 255)
+green = (0, 255, 0)
+red = (255, 0, 0)
+white = (255, 255, 255)
+black = (0, 0, 0)
+
+
+def textInput(screen, maxLength, prompt):
+    # fill the screen w/ black
+    screen.fill(black)
+    ypos = 0
+    deltay = 25
+    txtbx = []
+    # For getting the return values
+    a = ['']
+    # here is the magic: making the text input
+    # create an input with a max length of 45,
+    # and a red color and a prompt saying 'type here $i: '
+    txtbx.append(eztext.Input(maxlength=maxLength,
+                              color=blue, y=ypos,
+                              prompt=prompt))
+    ypos += deltay
+
+    # create the pygame clock
+    clock = pygame.time.Clock()
+    # main loop!
+
+    while True:
+        # make sure the program is running at 30 fps
+        clock.tick(30)
+
+        # events for txtbx
+        events = pygame.event.get()
+        # process other events
+        for event in events:
+            # close it x button si pressed
+            if event.type == QUIT:
+                return "None"
+
+        # clear the screen
+        screen.fill(white)  # I like black better :)
+        # update txtbx and get return val
+        a[0] = txtbx[0].update(events)
+        txtbx[0].focus = True
+        txtbx[0].color = black
+
+        # blit txtbx[i] on the screen
+        txtbx[0].draw(screen)
+
+        # Changing the focus to the next element
+        # every time enter is pressed
+        if a[0] != None:
+            return a[0]
+
+        # refresh the display
+        pygame.display.flip()
 
 
 class BoxesGame(ConnectionListener):
@@ -25,7 +89,7 @@ class BoxesGame(ConnectionListener):
             pygame.mixer.music.play()
 
     def Network_close(self, data):
-        exit()
+        sys.exit()
 
     def Network_yourturn(self, data):
         #  torf = short for true or false
@@ -57,11 +121,11 @@ class BoxesGame(ConnectionListener):
         #  1
         pygame.init()
         pygame.font.init()
-        width, height = 389, 489
+        width, height = 489, 389
         #  2
         # initialize the screen
         self.screen = pygame.display.set_mode((width, height))
-        pygame.display.set_caption("Boxes")
+        pygame.display.set_caption("Boxxy")
         # 3
         # initialize pygame clock
         self.clock = pygame.time.Clock()
@@ -73,18 +137,16 @@ class BoxesGame(ConnectionListener):
         self.otherplayer = 0
         self.didiwin = False
         self.running = False
-        enableSound = raw_input("Enable sound and music: ")
+
+        enableSound = textInput(self.screen, 5, "Enable sound and music: ")
         if enableSound == "1" or enableSound.lower() == "true":
             self.enableSound = True
-        elif enableSound == "0" or enableSound.lower() == "1":
-            self.enableSound = False
         else:
-            print("Unrecognized input, defaulting to False")
             self.enableSound = False
 
         self.initSound()
 
-        address = raw_input("Address of Server: ")
+        address = textInput(self.screen, 30, "Address of Server: ")
         try:
             if not address:
                 host, port = "localhost", 8000
@@ -95,11 +157,22 @@ class BoxesGame(ConnectionListener):
             print("Error Connecting to Server")
             print("Usage:", "host:port")
             print("e.g.", "localhost:31425")
-            exit()
+            sys.exit()
+
+        width, height = 389, 489
+        self.screen = pygame.display.set_mode((width, height))
+
         print("Boxes client started, waiting for server and/or the other player")
         self.running = False
         self.owner = [[0 for x in range(6)] for y in range(6)]
         while not self.running:
+            # events for txtbx
+            events = pygame.event.get()
+            # process other events
+            for event in events:
+                # close it x button si pressed
+                if event.type == QUIT:
+                    sys.exit()
             self.Pump()
             connection.Pump()
             sleep(0.05)
@@ -184,7 +257,7 @@ class BoxesGame(ConnectionListener):
         for event in pygame.event.get():
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
-                exit()
+                sys.exit()
 
         # update the screen
         # 1
@@ -277,8 +350,9 @@ class BoxesGame(ConnectionListener):
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    exit()
+                    sys.exit()
             pygame.display.flip()
+
 bg = BoxesGame()  # __init__ is called right here
 while 1:
     if bg.update() == 1:

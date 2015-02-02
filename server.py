@@ -1,6 +1,71 @@
 import PodSixNet.Channel
 import PodSixNet.Server
+import pygame
+from pygame.locals import *
 from time import sleep
+from EzText import eztext
+import sys
+
+if sys.platform == "win32":
+    import pygame._view
+
+# defining some colors
+blue = (0, 0, 255)
+green = (0, 255, 0)
+red = (255, 0, 0)
+white = (255, 255, 255)
+black = (0, 0, 0)
+
+
+def textInput(screen, maxLength, prompt):
+    # fill the screen w/ black
+    screen.fill(black)
+    ypos = 0
+    deltay = 25
+    txtbx = []
+    # For getting the return values
+    a = ['']
+    # here is the magic: making the text input
+    # create an input with a max length of 45,
+    # and a red color and a prompt saying 'type here $i: '
+    txtbx.append(eztext.Input(maxlength=maxLength,
+                              color=blue, y=ypos,
+                              prompt=prompt))
+    ypos += deltay
+
+    # create the pygame clock
+    clock = pygame.time.Clock()
+    # main loop!
+
+    while True:
+        # make sure the program is running at 30 fps
+        clock.tick(30)
+
+        # events for txtbx
+        events = pygame.event.get()
+        # process other events
+        for event in events:
+            # close it x button si pressed
+            if event.type == QUIT:
+                return "None"
+
+        # clear the screen
+        screen.fill(white)  # I like black better :)
+        # update txtbx and get return val
+        a[0] = txtbx[0].update(events)
+        txtbx[0].focus = True
+        txtbx[0].color = black
+
+        # blit txtbx[i] on the screen
+        txtbx[0].draw(screen)
+
+        # Changing the focus to the next element
+        # every time enter is pressed
+        if a[0] != None:
+            return a[0]
+
+        # refresh the display
+        pygame.display.flip()
 
 
 class ClientChannel(PodSixNet.Channel.Channel):
@@ -129,13 +194,29 @@ class Game:
             self.player0.Send(data)
             self.player1.Send(data)
 print("STARTING SERVER ON LOCALHOST")
+
+pygame.init()
+width, height = 500, 20
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Boxxy server")
+
 #  try:
-address = raw_input("Host:Port (localhost:8000): ")
+address = textInput(screen, 30, "Host:Port (localhost:8000): ")
+if address == "None":
+    sys.exit()
+
 if not address:
     host, port = "localhost", 8000
 else:
     host, port = address.split(":")
 boxesServe = BoxesServer(localaddr=(host, int(port)))
 while True:
+    events = pygame.event.get()
+    # process other events
+    for event in events:
+        # close it x button si pressed
+        if event.type == QUIT:
+            sys.exit()
+
     boxesServe.tick()
     sleep(0.01)
