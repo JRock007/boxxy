@@ -35,7 +35,7 @@ class pygame2exe(py2exe.build_exe.py2exe):  # This hack make sure that pygame de
 class BuildExe:
     def __init__(self):
         # Name of starting .py
-        self.script = "main.py"
+        self.script = "windows_main.py"
 
         # Name of program
         self.project_name = "Boxxy"
